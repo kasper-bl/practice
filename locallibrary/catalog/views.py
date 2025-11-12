@@ -5,15 +5,14 @@ def index(request):
 
     num_books = Book.objects.all().count()
     num_instances = BookInstance.objects.all().count()
-    num_instances_available = BookInstance.objects.filter(
-        status__exact='a').count()
+    num_instances_available = BookInstance.objects.filter(status__exact='a').count()
     num_authors = Author.objects.count()  
     num_genres = Genre.objects.count()
     search_word = 'окак'
+    num_visits=request.session.get('num_visits', 0)
+    request.session['num_visits'] = num_visits+1
 
     num_books_with_word = Book.objects.filter(title__icontains=search_word).count()
-
-    num_visits = request.session.get('num_visits', 0)
     num_visits += 1
     request.session['num_visits'] = num_visits
 
@@ -44,3 +43,4 @@ class AuthorDetailView(generic.DetailView):
 
 class AuthorUpdateView(generic.UpdateView):
     model = Author
+
