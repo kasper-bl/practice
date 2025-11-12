@@ -16,5 +16,9 @@
   </ul>
   <p><strong>Жанров в базе:</strong> {{ num_genres }}</p>
   <p><strong>Книг со словом "окак" в названии:</strong> {{ num_books_with_word }}</p>
+  <form action="{% url 'logout' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+  </form>
 
 {% endblock %}
