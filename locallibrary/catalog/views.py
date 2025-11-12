@@ -26,3 +26,11 @@ def index(request):
                  'num_books_with_word': num_books_with_word,
                  'num_visits': num_visits},
     )
+
+from django.views import generic
+
+class BookListView(generic.ListView):
+    model = Book
+    
+class BookDetailView(generic.DetailView):
+    model = Book
