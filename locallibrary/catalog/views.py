@@ -56,3 +56,36 @@ class LoanedBooksByUserListView(LoginRequiredMixin,generic.ListView):
     def get_queryset(self):
         return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
 
+from django.contrib.auth.mixins import PermissionRequiredMixin
+
+class AllBorrowedBooksListView(PermissionRequiredMixin, generic.ListView):
+    model = BookInstance
+    template_name = 'catalog/bookinstance_list_borrowed_all.html'
+    permission_required = 'catalog.can_mark_returned'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return BookInstance.objects.filter(status__exact='o').order_by('due_back')
+    
+
+from django.contrib.auth.decorators import permission_required
+from django.shortcuts import get_object_or_404, render, redirect
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from datetime import date
+@permission_required('catalog.can_mark_returned')
+def renew_book_librarian(request, pk):
+    book_instance = get_object_or_404(BookInstance, pk=pk)
+
+    if request.method == 'POST':
+        # Обработка формы
+        new_due_date = request.POST.get('renewal_date')
+        book_instance.due_back = new_due_date
+        book_instance.save()
+        return HttpResponseRedirect(reverse('all-borrowed'))
+
+    context = {
+        'book_instance': book_instance,
+        'form_date': date.today().strftime('%Y-%m-%d'),  # подсказка для input[type="date"]
+    }
+    return render(request, 'catalog/book_renew_librarian.html', context)
