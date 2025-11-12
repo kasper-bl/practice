@@ -1,8 +1,6 @@
 from django.db import models
 from django.urls import reverse 
-import uuid 
-from datetime import date
-from django.conf import settings
+
 from django.db.models import UniqueConstraint
 from django.db.models.functions import Lower
 
@@ -17,6 +15,24 @@ class Genre(models.Model):
         String for representing the Model object (in Admin site etc.)
         """
         return self.name
+
+class Language(models.Model):
+    name = models.CharField(max_length=200, help_text="Enter the language of the book")
+
+    def get_absolute_url(self):
+        return reverse('language-detail', args=[str(self.id)])
+            
+    def __str__(self):
+        return self.name
+            
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                Lower('name'),
+                name='language_name_case_insensitive_unique',
+                violation_error_message = "Language already exists"
+            ),
+        ]
     
 
 class Book(models.Model):
@@ -43,7 +59,14 @@ class Book(models.Model):
         return reverse('book-detail', args=[str(self.id)])
     def display_genre(self):
         return ', '.join([ genre.name for genre in self.genre.all()[:3] ])
+    
     display_genre.short_description = 'Genre'
+
+
+import uuid 
+from datetime import date
+
+from django.conf import settings
     
 
 class BookInstance(models.Model):
@@ -86,20 +109,3 @@ class Author(models.Model):
         """
         return f"{self.last_name}, {self.first_name}"
         
-class Language(models.Model):
-    name = models.CharField(max_length=200, help_text="Enter the language of the book")
-
-    def get_absolute_url(self):
-        return reverse('language-detail', args=[str(self.id)])
-            
-    def __str__(self):
-        return self.name
-            
-    class Meta:
-        constraints = [
-            UniqueConstraint(
-                Lower('name'),
-                name='language_name_case_insensitive_unique',
-                violation_error_message = "Language already exists"
-            ),
-        ]
