@@ -109,6 +109,7 @@ def renew_book_librarian(request, pk):
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import Author
+from .models import Book
 
 class AuthorCreate(CreateView):
     model = Author
@@ -122,3 +123,17 @@ class AuthorUpdate(UpdateView):
 class AuthorDelete(DeleteView):
     model = Author
     success_url = reverse_lazy('authors')
+
+
+class BookCreate(CreateView):
+    model = Book
+    fields = '__all__'
+
+
+class BookUpdate(UpdateView):
+    model = Book
+
+class BookDelete(DeleteView):
+    model = Book
+    success_url = reverse_lazy('books')
+
